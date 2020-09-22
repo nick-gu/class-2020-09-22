@@ -103,10 +103,17 @@ After we have a model, Temperance suggests we should:
 
 ```{r, echo = FALSE}
 
-difference <- inner_join(sep_new, sep_old, "id") %>%
-  filter(u_grad.x >= 10 & u_grad.y >= 10) %>%
-  mutate(difference = u_grad.x - u_grad.y)
+sep_diff <- inner_join(sep_new, sep_old, by = "id", suffix = c(".new", ".old")) %>%
+  filter(u_grad.new >= 10 & u_grad.old >= 10) %>%
+  mutate(differenceen = u_grad.new - u_grad.old)
+
+largediff <- sep_diff %>% 
+  arrange(differenceen) %>%
+  slice(1:5)
   
+largeinc <- sep_diff %>% 
+  arrange(desc(differenceen)) %>%
+  slice(1:5)
 
 ```
 
