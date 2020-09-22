@@ -41,10 +41,9 @@ sep_old <-
          name = course_name,
          department = course_department) %>% 
   group_by(id) %>%
-  mutate(u_grad = sum(u_grad), .groups = "drop") %>%
+  summarise(u_grad = sum(u_grad), .groups = "drop") 
   #filter(u_grad > 10) %>%
-  distinct()
-
+  
 
 # But this is not correct! Look for Gov 50: Data. What do you see? What can you
 # do to clean it up?
@@ -71,9 +70,9 @@ sep_new <-
          name = course_name,
          department = course_department) %>% 
   group_by(id) %>%
-  mutate(u_grad = sum(u_grad), .groups = "drop") %>%
+  summarise(u_grad = sum(u_grad), .groups = "drop")
   #filter(u_grad > 10) %>%
-  distinct()
+  
 
 ```
 
