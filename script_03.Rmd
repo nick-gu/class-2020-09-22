@@ -40,7 +40,11 @@ sep_old <-
          title = course_title,
          name = course_name,
          department = course_department) %>% 
-  filter(u_grad > 10)
+  group_by(id) %>%
+  mutate(u_grad = sum(u_grad), .groups = "drop") %>%
+  #filter(u_grad > 10) %>%
+  distinct()
+
 
 # But this is not correct! Look for Gov 50: Data. What do you see? What can you
 # do to clean it up?
@@ -53,6 +57,25 @@ sep_old <-
 
 **Prompt:** Read in and clean the new data, creating an object called `sep_new`. 
 
+```{r, echo = FALSE}
+
+sep_new <- 
+  read_excel("new_data/class_enrollment_summary_by_term_9-21-2020.xlsx", 
+             skip = 3) %>% 
+  clean_names() %>% 
+  filter(! is.na(course_title)) %>% 
+  select(-grad, -non_degree, -x_reg, -vus, -employee, 
+         -withdraw, -total, -instructor_full_name, -course_section_code) %>%
+  rename(id = course_id,
+         title = course_title,
+         name = course_name,
+         department = course_department) %>% 
+  group_by(id) %>%
+  mutate(u_grad = sum(u_grad), .groups = "drop") %>%
+  #filter(u_grad > 10) %>%
+  distinct()
+
+```
 
 
 ### Scene 2
@@ -61,16 +84,31 @@ sep_old <-
 
 Before we start on the model, Wisdom suggests we should:
 
+- We want to define what we really want to know (the measurement)--the difference in undergrad enrollment between Sept 1. and now.
+- We want to know why that difference exists and why we care about it?
+- We have to make assumptions for what we don't want, limiting our missing data (differences between the data from days we don't have or do not care about)
+- We make the assumption that all classes have the possibility of dropping above or below the 10-person threshold, so we got rid of the filter only grabbing classes with more than 10-students.
 
 After we have a model, Temperance suggests we should:
 
-
+- Understand the limitations of our data: we cannot make causational assumption from our data, or assume the same treatment effect on enrollment affects every class. 
+- We also need to ensure that our data is valid externally to the population we're observing
+- Moreover, we cannot introduce items of selection bias or manipulating assiggment mechanisms.
+- We need to make sure our code is correct in order to ensure internal validity.
 
 ### Scene 3
 
 **Prompt:** Which classes had the biggest increases and decreases in undergraduate enrollments between September 1 and today? Make a graphic that shows the 5 biggest increases and decreases. Make it look nice.
 
 
+```{r, echo = FALSE}
+
+difference <- inner_join(sep_new, sep_old, "id") %>%
+  filter(u_grad.x >= 10 & u_grad.y >= 10) %>%
+  mutate(difference = u_grad.x - u_grad.y)
+  
+
+```
 
 
 
